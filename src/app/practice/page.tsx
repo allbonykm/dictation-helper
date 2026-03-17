@@ -36,21 +36,15 @@ function PracticeContent() {
   const currentErrors = errorsBySentence[currentIdx] || [];
 
   const handleSpeak = () => {
-    if ('speechSynthesis' in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      // 진행 중인 모든 음성 취소
       window.speechSynthesis.cancel();
+      
       const utterance = new SpeechSynthesisUtterance(currentSentence);
-      
-      // 시스템의 한국어 음성들 중 하나를 선택
-      const voices = window.speechSynthesis.getVoices();
-      const koVoice = voices.find(v => v.lang === 'ko-KR' || v.lang === 'ko_KR');
-      
-      if (koVoice) {
-        utterance.voice = koVoice;
-      }
-      
       utterance.lang = 'ko-KR';
-      utterance.rate = 0.8; // 율이를 위해 조금 천천히
-      utterance.pitch = 1.1; // 약간 더 밝고 친절한 톤으로
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+      
       window.speechSynthesis.speak(utterance);
     }
   };

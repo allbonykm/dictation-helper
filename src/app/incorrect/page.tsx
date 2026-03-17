@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import WongojiInput from '@/components/WongojiInput';
-import styles from '@/app/practice/practice.module.css';
+import WongojiInput from '../../components/WongojiInput';
+import styles from '../practice/practice.module.css';
 
 export default function IncorrectNotePage() {
   const router = useRouter();
@@ -36,20 +36,14 @@ export default function IncorrectNotePage() {
   const currentSentence = sentences[currentIdx];
 
   const handleSpeak = () => {
-    if ('speechSynthesis' in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(currentSentence);
       
-      const voices = window.speechSynthesis.getVoices();
-      const koVoice = voices.find(v => v.lang === 'ko-KR' || v.lang === 'ko_KR');
-      
-      if (koVoice) {
-        utterance.voice = koVoice;
-      }
-
       utterance.lang = 'ko-KR';
       utterance.rate = 0.8;
-      utterance.pitch = 1.1;
+      utterance.pitch = 1.0;
+      
       window.speechSynthesis.speak(utterance);
     }
   };
