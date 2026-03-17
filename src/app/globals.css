@@ -1,27 +1,19 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Warm Pastel Palette */
+  --background: #FDFBF7; /* Soft Ivory */
+  --foreground: #4A4A4A; /* Charcoal for readability */
+  --primary: #FFB7B2;    /* Pastel Pink */
+  --secondary: #B2E2F2;  /* Pastel Blue */
+  --accent: #B2F2BB;     /* Pastel Green */
+  --border: #E5E0D5;
+  
+  /* Won-go-ji (Manuscript) Specifics */
+  --grid-color: rgba(178, 242, 187, 0.5); /* Mint Green Grid */
+  --cell-size: 40px;
+  
+  /* Spacing & Radii */
+  --radius: 12px;
+  --spacing: 16px;
 }
 
 * {
@@ -30,13 +22,56 @@ body {
   margin: 0;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+html,
+body {
+  max-width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+body {
+  display: flex;
+  flex-direction: column;
 }
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing);
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+h1, h2, h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  font-size: 1rem;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Common Components */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  padding: var(--spacing);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+}
+

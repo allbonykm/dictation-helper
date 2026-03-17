@@ -1,0 +1,97 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 1rem;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 600px;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stepTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.stepCount {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #888;
+  background: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.navButton {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 8px 15px;
+  font-size: 1.2rem;
+  color: var(--primary);
+}
+
+.navButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.mainAction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.bigAudioButton {
+  background-color: var(--secondary);
+  color: #2c5282;
+  font-weight: 800;
+  font-size: 1.5rem;
+  padding: 1.5rem 3rem;
+  box-shadow: 0 6px 20px rgba(178, 226, 242, 0.4);
+}
+
+.checkStartButton {
+  background-color: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  padding: 1.2rem 2.5rem;
+}
+
+.checkerArea {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.doneButton {
+  background-color: var(--accent);
+  color: #2d5a27;
+  font-weight: 700;
+  padding: 1rem 2.5rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

@@ -1,0 +1,17 @@
+{
+  "name": "율이 받아쓰기 도우미",
+  "short_name": "율이 받아쓰기",
+  "description": "아빠가 만든 율이만을 위한 받아쓰기 앱",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FDFBF7",
+  "theme_color": "#FFB7B2",
+  "icons": [
+    {
+      "src": "/heart.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
