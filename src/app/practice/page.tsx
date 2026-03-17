@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { DICTATION_DATA } from '@/data/sentences';
-import WongojiInput from '@/components/WongojiInput';
+import { DICTATION_DATA } from '../../data/sentences';
+import WongojiInput from '../../components/WongojiInput';
 import styles from './practice.module.css';
 
 function PracticeContent() {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { DICTATION_DATA } from "@/data/sentences";
+import { DICTATION_DATA } from "../data/sentences";
 import styles from "./page.module.css";
 
 export default function Home() {
