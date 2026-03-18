@@ -29,8 +29,9 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-family: 'Noto Serif KR', 'Gungsuh', 'GungsuhChe', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
   color: #333;
 }
 
