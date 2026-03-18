@@ -40,12 +40,12 @@ export default function Home() {
         </p>
 
         <div className={styles.buttonGroup}>
-          <p className={styles.selectLabel}>공부할 회차를 골라주세요!</p>
+          <p className={styles.selectLabel}>공부할 단계를 골라주세요!</p>
           <div className={styles.stepGrid}>
             {steps.map((step) => (
               <Link key={step.id} href={`/practice?step=${step.id}`} style={{ textDecoration: 'none' }}>
                 <button className={styles.stepButton}>
-                  {step.id}회차
+                  {step.id}급
                 </button>
               </Link>
             ))}

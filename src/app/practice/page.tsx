@@ -10,7 +10,7 @@ function PracticeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  // URL에서 몇 회차인지 가져옴 (기본값 1회차)
+  // URL에서 몇 급인지 가져옴 (기본값 1급)
   const stepParam = searchParams.get('step');
   const stepId = stepParam ? parseInt(stepParam) : 1;
   const currentSet = DICTATION_DATA[stepId];
@@ -19,11 +19,11 @@ function PracticeContent() {
   const [isChecking, setIsChecking] = useState(false);
   const [errorsBySentence, setErrorsBySentence] = useState<Record<number, number[]>>({});
 
-  // 회차가 존재하지 않을 경우 처리
+  // 해당 급의 정보가 존재하지 않을 경우 처리
   if (!currentSet) {
     return (
       <div className={styles.container}>
-        <h2>앗! {stepId}회차 정보를 찾을 수 없어요.</h2>
+        <h2>앗! {stepId}급 정보를 찾을 수 없어요.</h2>
         <button className={styles.checkStartButton} onClick={() => router.push('/')}>
           처음으로 돌아가기
         </button>
