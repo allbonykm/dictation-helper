@@ -37,6 +37,7 @@ export default function IncorrectNotePage() {
 
   const handleSpeak = () => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.resume();
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(currentSentence);
       

@@ -37,7 +37,9 @@ function PracticeContent() {
 
   const handleSpeak = () => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      // 진행 중인 모든 음성 취소
+      // 1. 혹시 멈춰있을지 모를 엔진을 깨웁니다.
+      window.speechSynthesis.resume();
+      // 2. 진행 중인 모든 음성 취소
       window.speechSynthesis.cancel();
       
       const utterance = new SpeechSynthesisUtterance(currentSentence);
@@ -45,6 +47,7 @@ function PracticeContent() {
       utterance.rate = 0.8;
       utterance.pitch = 1.0;
       
+      // 3. 브라우저가 음성을 끝까지 내보내도록 보장
       window.speechSynthesis.speak(utterance);
     }
   };
