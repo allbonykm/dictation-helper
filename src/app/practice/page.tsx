@@ -37,21 +37,25 @@ function PracticeContent() {
 
   const handleSpeak = () => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      // 1. 혹시 멈춰있을지 모를 엔진을 깨웁니다.
+      // 1. 초기화 및 강제 재개
+      window.speechSynthesis.pause();
       window.speechSynthesis.resume();
-      // 2. 진행 중인 모든 음성 취소
       window.speechSynthesis.cancel();
       
-      const utterance = new SpeechSynthesisUtterance(currentSentence);
-      utterance.lang = 'ko-KR';
-      utterance.rate = 0.8;
-      utterance.pitch = 1.0;
+      // 2. 브라우저 엔진이 정리될 시간을 아주 잠깐 줍니다.
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(currentSentence);
+        utterance.lang = 'ko-KR';
+        utterance.rate = 0.8;
+        utterance.pitch = 1.0;
 
-      // 3. 가비지 컬렉션 방지: 전역 객체에 참조 유지
-      (window as any)._utterance = utterance;
-      
-      // 4. 브라우저가 음성을 끝까지 내보내도록 보장
-      window.speechSynthesis.speak(utterance);
+        utterance.onstart = () => console.log("🔊 음성 재생 시작!");
+        utterance.onerror = (e) => console.error("❌ 음성 재생 에러:", e);
+
+        // 3. 가비지 컬렉션 방지 및 재생
+        (window as any)._utterance = utterance;
+        window.speechSynthesis.speak(utterance);
+      }, 100);
     }
   };
 

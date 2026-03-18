@@ -37,18 +37,19 @@ export default function IncorrectNotePage() {
 
   const handleSpeak = () => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.pause();
       window.speechSynthesis.resume();
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(currentSentence);
       
-      utterance.lang = 'ko-KR';
-      utterance.rate = 0.8;
-      utterance.pitch = 1.0;
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(currentSentence);
+        utterance.lang = 'ko-KR';
+        utterance.rate = 0.8;
+        utterance.pitch = 1.0;
 
-      // 가비지 컬렉션 방지
-      (window as any)._utterance = utterance;
-      
-      window.speechSynthesis.speak(utterance);
+        (window as any)._utterance = utterance;
+        window.speechSynthesis.speak(utterance);
+      }, 100);
     }
   };
 
