@@ -189,3 +189,43 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* 도장 및 축하 효과 스타일 */
+.stampContainer {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: stampPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  opacity: 0;
+}
+
+@keyframes stampPop {
+  0% { transform: translate(-50%, -50%) scale(5); opacity: 0; }
+  70% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.geckoIcon {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 8px solid #FFAB91; /* 도장 테두리 */
+  padding: 5px;
+  background-color: #FFF9F4;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.stampText {
+  margin-top: 1.5rem;
+  font-size: 3rem;
+  color: #E64A19;
+  font-weight: 800;
+  text-shadow: 2px 2px 0px rgba(255,255,255,0.8), -2px -2px 0px rgba(255,255,255,0.8);
+  transform: rotate(-5deg);
+}
+

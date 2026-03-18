@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { DICTATION_DATA } from '../../data/sentences';
+import confetti from 'canvas-confetti';
 import WongojiInput from '../../components/WongojiInput';
 import styles from './practice.module.css';
 
@@ -99,11 +100,49 @@ function PracticeContent() {
     router.push('/');
   };
 
+  const handleFinishPractice = () => {
+    // 율이를 위한 예쁜 색상 조합
+    const colors = ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA'];
+
+    // 1. 왼쪽 아래에서 발사
+    confetti({
+      particleCount: 100,
+      angle: 60,
+      spread: 70,
+      origin: { x: 0, y: 0.8 },
+      colors: colors
+    });
+
+    // 2. 오른쪽 아래에서 발사
+    confetti({
+      particleCount: 100,
+      angle: 120,
+      spread: 70,
+      origin: { x: 1, y: 0.8 },
+      colors: colors
+    });
+
+    // 3. 중앙에서 화려하게 마무리 (약간의 딜레이)
+    setTimeout(() => {
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.5 },
+        colors: colors
+      });
+    }, 300);
+
+    // 1.5초 후 채점 모드로 전환 (폭죽을 즐길 시간!)
+    setTimeout(() => {
+      setViewMode('review');
+    }, 1800);
+  };
+
   const goToNext = () => {
     if (currentIdx < sentences.length - 1) {
       setCurrentIdx(currentIdx + 1);
     } else {
-      setViewMode('review');
+      handleFinishPractice();
     }
   };
 
@@ -185,7 +224,7 @@ function PracticeContent() {
 
       <div className={styles.practiceFooter}>
         {currentIdx === sentences.length - 1 ? (
-          <button className={styles.checkStartButton} onClick={() => setViewMode('review')}>
+          <button className={styles.checkStartButton} onClick={handleFinishPractice}>
             채점 시작하기 ✍️
           </button>
         ) : (

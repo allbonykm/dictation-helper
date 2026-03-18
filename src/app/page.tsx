@@ -40,19 +40,19 @@ export default function Home() {
             priority
           />
         </div>
-        
+
         <h1 className={styles.title}>
           율이를 위한<br />
           <span>받아쓰기 도우미</span>
         </h1>
-        
+
         <p className={styles.description}>
-          세상에서 제일 소중한 우리 율이,<br />
-          율이를 위한 받아쓰기 도우미
+          세상에서 제일 멋진 청곡초 2학년 율이,<br />
+          조율이를 위한 받아쓰기 도우미
         </p>
 
         <div className={styles.buttonGroup}>
-          <p className={styles.selectLabel}>공부할 단계를 골라주세요!</p>
+          <p className={styles.selectLabel}>받아쓰기 급수를 골라주세요!</p>
           <div className={styles.stepGrid}>
             {steps.map((step) => (
               <Link key={step.id} href={`/practice?step=${step.id}`} style={{ textDecoration: 'none' }}>
@@ -65,7 +65,7 @@ export default function Home() {
 
           {incorrectCount > 0 && (
             <Link href="/incorrect" style={{ textDecoration: 'none', marginTop: '1.5rem', width: '100%' }}>
-              <button className={styles.subButton} style={{backgroundColor: '#FFE8E8', border: '2px solid #FFB7B2'}}>
+              <button className={styles.subButton} style={{ backgroundColor: '#FFE8E8', border: '2px solid #FFB7B2' }}>
                 📖 오답 노트 ({incorrectCount}개 남음)
               </button>
             </Link>
@@ -74,7 +74,7 @@ export default function Home() {
       </div>
 
       <footer className={styles.footer}>
-        <p>아빠가 사랑을 담아 만들었어 ❤️</p>
+        <p>아빠의 사랑을 받아랏! ❤️</p>
       </footer>
     </main>
   );

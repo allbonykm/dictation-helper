@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import confetti from 'canvas-confetti';
 import WongojiInput from '../../components/WongojiInput';
 import styles from '../practice/practice.module.css';
 
@@ -33,16 +34,73 @@ export default function IncorrectNotePage() {
 
   const totalCount = Object.values(groupedSentences).flat().length;
 
+  // 오답 정복 시 자동으로 별빛 폭죽 터뜨리기!
+  useEffect(() => {
+    if (!isLoading && totalCount === 0) {
+      const colors = ['#FFD700', '#FFFACD', '#FFFFFF', '#FFEC8B']; // 황금색, 레몬색, 화이트
+
+      // 1. 3초 동안 별들이 화려하게 쏟아짐 🌠
+      const end = Date.now() + 3000;
+
+      const frame = () => {
+        confetti({
+          particleCount: 2,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors,
+          shapes: ['star']
+        });
+        confetti({
+          particleCount: 2,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors,
+          shapes: ['star']
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      };
+      
+      frame();
+
+      // 2. 무작위 별빛 세례
+      const interval = setInterval(() => {
+        confetti({
+          particleCount: 15,
+          angle: Math.random() * 360,
+          spread: 100,
+          origin: { x: Math.random(), y: Math.random() - 0.2 },
+          colors: colors,
+          shapes: ['star']
+        });
+      }, 200);
+
+      setTimeout(() => clearInterval(interval), 3000);
+    }
+  }, [isLoading, totalCount]);
+
   if (isLoading) return <div className={styles.container}>불러오는 중...</div>;
 
   if (totalCount === 0) {
     return (
       <div className={styles.container}>
-        <h2 style={{fontSize: '2rem', marginBottom: '2rem'}}>🎉 율이야, 대단해!</h2>
-        <p style={{fontSize: '1.2rem', color: '#666'}}>틀린 문제가 하나도 없어!</p>
-        <button className={styles.checkStartButton} onClick={() => router.push('/')} style={{marginTop: '3rem'}}>
-          홈으로 가기 🏠
-        </button>
+        {/* 게코 칭찬 도장 쾅! */}
+        <div className={styles.stampContainer}>
+          <img src="/gecko_stamp.png" alt="게코 도장" className={styles.geckoIcon} />
+          <p className={styles.stampText}>참 잘했어요!</p>
+        </div>
+
+        <div style={{marginTop: '250px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <h2 style={{fontSize: '2rem', marginBottom: '1rem'}}>🎉 율이야, 대단해!</h2>
+          <p style={{fontSize: '1.2rem', color: '#666'}}>틀린 문제가 하나도 없어!</p>
+          <button className={styles.checkStartButton} onClick={() => router.push('/')} style={{marginTop: '3rem'}}>
+            홈으로 가기 🏠
+          </button>
+        </div>
       </div>
     );
   }
