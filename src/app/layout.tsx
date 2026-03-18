@@ -9,7 +9,7 @@ const notoSerifKR = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "율이를 위한 받아쓰기 도우미 ❤️",
+  title: "청곡초 2학년 받아쓰기 도우미",
   description: "아빠가 사랑을 담아 만든 율이의 받아쓰기 연습 앱",
   manifest: "/manifest.json",
   themeColor: "#FFB7B2",
