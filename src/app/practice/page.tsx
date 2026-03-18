@@ -19,6 +19,7 @@ function PracticeContent() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [viewMode, setViewMode] = useState<'practice' | 'review'>('practice');
   const [errorsBySentence, setErrorsBySentence] = useState<Record<number, number[]>>({});
+  const [speakSpeed, setSpeakSpeed] = useState<number>(0.8); // 기본 속도 0.8
 
   // 해당 급의 정보가 존재하지 않을 경우 처리
   if (!currentSet) {
@@ -45,7 +46,7 @@ function PracticeContent() {
       window.speechSynthesis.resume();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ko-KR';
-      utterance.rate = 0.8;
+      utterance.rate = speakSpeed; // 선택된 속도 적용
       utterance.pitch = 1.0;
       (window as any)._lastUtterance = utterance;
       window.speechSynthesis.speak(utterance);
@@ -167,6 +168,18 @@ function PracticeContent() {
         <button className={styles.bigAudioButton} onClick={() => handleSpeak(currentSentence)}>
           🔊 크게 듣기
         </button>
+        
+        <div className={styles.speedControls}>
+          <button 
+            className={`${styles.speedButton} ${speakSpeed === 1.0 ? styles.activeSpeed : ''}`}
+            onClick={() => setSpeakSpeed(1.0)}
+          >보통</button>
+          <button 
+            className={`${styles.speedButton} ${speakSpeed === 0.6 ? styles.activeSpeed : ''}`}
+            onClick={() => setSpeakSpeed(0.6)}
+          >🐢 느리게</button>
+        </div>
+
         <p className={styles.instruction}>율이가 공책에 다 쓰면 다음 버튼을 눌러주세요.</p>
       </div>
 

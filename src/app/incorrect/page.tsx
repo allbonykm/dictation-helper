@@ -14,6 +14,7 @@ export default function IncorrectNotePage() {
   const [isChecking, setIsChecking] = useState(false);
   const [errorIndices, setErrorIndices] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [speakSpeed, setSpeakSpeed] = useState<number>(0.8);
 
   useEffect(() => {
     const rawSaved = localStorage.getItem('incorrect_sentences');
@@ -95,7 +96,7 @@ export default function IncorrectNotePage() {
       window.speechSynthesis.resume();
       const utterance = new SpeechSynthesisUtterance(currentSentence);
       utterance.lang = 'ko-KR';
-      utterance.rate = 0.8;
+      utterance.rate = speakSpeed;
       utterance.pitch = 1.0;
       (window as any)._lastUtterance = utterance;
       window.speechSynthesis.speak(utterance);
@@ -152,6 +153,18 @@ export default function IncorrectNotePage() {
         <button className={styles.bigAudioButton} onClick={handleSpeak}>
           🔊 소리 듣기
         </button>
+
+        <div className={styles.speedControls}>
+          <button 
+            className={`${styles.speedButton} ${speakSpeed === 1.0 ? styles.activeSpeed : ''}`}
+            onClick={() => setSpeakSpeed(1.0)}
+          >보통</button>
+          <button 
+            className={`${styles.speedButton} ${speakSpeed === 0.6 ? styles.activeSpeed : ''}`}
+            onClick={() => setSpeakSpeed(0.6)}
+          >🐢 느리게</button>
+        </div>
+
         <p className={styles.instruction}>오답을 다시 연습해봐요.</p>
       </div>
 

@@ -19,7 +19,8 @@ export const metadata: Metadata = {
     title: "율이 받아쓰기",
   },
   icons: {
-    apple: "/heart.png",
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
   },
 };
 
