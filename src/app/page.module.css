@@ -2,10 +2,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 90vh;
+  justify-content: flex-start;
+  min-height: 100vh;
   text-align: center;
-  padding: var(--spacing);
+  padding: 3rem 1rem;
 }
 
 .welcomeCard {
@@ -67,7 +67,7 @@
 .stepGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 0.8rem;
   width: 100%;
 }
 
@@ -75,14 +75,31 @@
   background-color: var(--primary);
   color: white;
   font-weight: 700;
-  font-size: 1.1rem;
-  padding: 1rem;
+  font-size: 1rem;
+  padding: 0.8rem;
   width: 100%;
-  box-shadow: 0 4px 10px rgba(255, 183, 178, 0.3);
+  box-shadow: 0 4px 10px rgba(255, 183, 178, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
 }
 
 .stepButton:hover {
   background-color: #ff9d97;
+  transform: translateY(-2px);
+}
+
+.subButton {
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  transition: all 0.2s;
+}
+
+.subButton:hover {
+  filter: brightness(0.95);
   transform: translateY(-2px);
 }
 
