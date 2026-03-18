@@ -36,27 +36,35 @@ function PracticeContent() {
   const currentErrors = errorsBySentence[currentIdx] || [];
 
   const handleSpeak = () => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      // 1. 초기화 및 강제 재개
-      window.speechSynthesis.pause();
-      window.speechSynthesis.resume();
-      window.speechSynthesis.cancel();
-      
-      // 2. 브라우저 엔진이 정리될 시간을 아주 잠깐 줍니다.
-      setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(currentSentence);
-        utterance.lang = 'ko-KR';
-        utterance.rate = 0.8;
-        utterance.pitch = 1.0;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
-        utterance.onstart = () => console.log("🔊 음성 재생 시작!");
-        utterance.onerror = (e) => console.error("❌ 음성 재생 에러:", e);
+    // 진행 중인 모든 음성을 중단하여 명령 큐를 정리합니다.
+    window.speechSynthesis.cancel();
 
-        // 3. 가비지 컬렉션 방지 및 재생
-        (window as any)._utterance = utterance;
-        window.speechSynthesis.speak(utterance);
-      }, 100);
+    if (!currentSentence) {
+      console.warn("🔊 재생할 문장이 없습니다.");
+      return;
     }
+
+    // 약간의 지연 시간을 두어 cancel()이 확실히 처리되게 합니다.
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(currentSentence);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+
+      utterance.onstart = () => console.log("🔊 음성 재생 시작: ", currentSentence);
+      utterance.onend = () => console.log("✅ 음성 재생 완료");
+      utterance.onerror = (e) => {
+        console.error("❌ 음성 재생 에러 발생:", (e as any).error, e);
+        // 'interrupted' 에러 시 재시도 로직이나 추가 안내가 필요할 수 있음
+      };
+
+      // 가비지 컬렉션 방지를 위해 전역 객체에 참조를 보관합니다.
+      (window as any)._utterance = utterance;
+      
+      window.speechSynthesis.speak(utterance);
+    }, 50);
   };
 
   const handleToggleError = (charIndex: number) => {

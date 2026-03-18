@@ -36,21 +36,24 @@ export default function IncorrectNotePage() {
   const currentSentence = sentences[currentIdx];
 
   const handleSpeak = () => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.pause();
-      window.speechSynthesis.resume();
-      window.speechSynthesis.cancel();
-      
-      setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(currentSentence);
-        utterance.lang = 'ko-KR';
-        utterance.rate = 0.8;
-        utterance.pitch = 1.0;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
-        (window as any)._utterance = utterance;
-        window.speechSynthesis.speak(utterance);
-      }, 100);
-    }
+    window.speechSynthesis.cancel();
+
+    if (!currentSentence) return;
+
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(currentSentence);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+
+      utterance.onstart = () => console.log("🔊 오답 음성 시작: ", currentSentence);
+      utterance.onerror = (e) => console.error("❌ 오답 음성 에러:", (e as any).error, e);
+
+      (window as any)._utterance = utterance;
+      window.speechSynthesis.speak(utterance);
+    }, 50);
   };
 
   const handleToggleError = (index: number) => {
