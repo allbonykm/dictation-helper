@@ -16,7 +16,7 @@ function PracticeContent() {
   const currentSet = DICTATION_DATA[stepId];
 
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [isChecking, setIsChecking] = useState(false);
+  const [viewMode, setViewMode] = useState<'practice' | 'review'>('practice');
   const [errorsBySentence, setErrorsBySentence] = useState<Record<number, number[]>>({});
 
   // 해당 급의 정보가 존재하지 않을 경우 처리
@@ -33,86 +33,121 @@ function PracticeContent() {
 
   const sentences = currentSet.sentences;
   const currentSentence = sentences[currentIdx];
-  const currentErrors = errorsBySentence[currentIdx] || [];
 
-  const handleSpeak = () => {
+  const handleSpeak = (text: string) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
-    // 1. 기존 재생 중단 및 엔진 깨우기
     window.speechSynthesis.cancel();
     window.speechSynthesis.resume();
+    if (!text) return;
 
-    if (!currentSentence) return;
-
-    // 2. 브라우저가 이전 명령을 완전히 정리할 수 있도록 넉넉한 시간을 줍니다.
     setTimeout(() => {
-      // 간혹 엔진이 일시정지 상태로 고착되는 경우가 있어 한 번 더 resume()
       window.speechSynthesis.resume();
-
-      const utterance = new SpeechSynthesisUtterance(currentSentence);
+      const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ko-KR';
       utterance.rate = 0.8;
       utterance.pitch = 1.0;
-
-      utterance.onstart = () => console.log("🔊 음성 재생 시작: ", currentSentence);
-      utterance.onerror = (e) => {
-        console.error("❌ 음성 재생 에러:", (e as any).error);
-        // 만약 또 중단되면 엔진을 완전히 초기화하고 다시 한 번 resume 시도
-        if ((e as any).error === 'interrupted') {
-          window.speechSynthesis.resume();
-        }
-      };
-
-      // 가비지 컬렉션 방지를 위한 전역 참조
       (window as any)._lastUtterance = utterance;
-      
       window.speechSynthesis.speak(utterance);
-    }, 250);
+    }, 100);
   };
 
-  const handleToggleError = (charIndex: number) => {
+  const handleToggleError = (sentenceIdx: number, charIndex: number) => {
+    const currentErrors = errorsBySentence[sentenceIdx] || [];
     const newErrors = currentErrors.includes(charIndex)
       ? currentErrors.filter(i => i !== charIndex)
       : [...currentErrors, charIndex];
     
     setErrorsBySentence({
       ...errorsBySentence,
-      [currentIdx]: newErrors
+      [sentenceIdx]: newErrors
     });
   };
 
-  const saveIncorrectSentences = () => {
-    // 에러가 1개라도 체크된 문장들만 필터링
+  const saveAllIncorrectSentences = () => {
+    // 에러가 1개라도 체크된 문장들만 추출
     const incorrects = Object.entries(errorsBySentence)
       .filter(([_, indices]) => indices.length > 0)
       .map(([idx, _]) => sentences[parseInt(idx)]);
 
-    if (incorrects.length === 0) return;
+    // 기존 저장 데이터 가져오기 (객체 형태: { "1급": [...], "2급": [...] })
+    const rawSaved = localStorage.getItem('incorrect_sentences');
+    let savedData: Record<string, string[]> = {};
+    
+    try {
+      const parsed = JSON.parse(rawSaved || '{}');
+      // 기존 데이터가 배열인 경우(구버전) 처리
+      if (Array.isArray(parsed)) {
+          savedData = { "미분류": parsed };
+      } else {
+          savedData = parsed;
+      }
+    } catch {
+      savedData = {};
+    }
 
-    // 기존 저장된 오답 가져오기
-    const saved = JSON.parse(localStorage.getItem('incorrect_sentences') || '[]');
-    // 중복 제거하며 합치기
-    const newSet = Array.from(new Set([...saved, ...incorrects]));
-    localStorage.setItem('incorrect_sentences', JSON.stringify(newSet));
+    const levelKey = `${stepId}급`;
+    const levelSentences = savedData[levelKey] || [];
+    
+    // 중복 제거하며 해당 급수에 합치기
+    const updatedLevelSentences = Array.from(new Set([...levelSentences, ...incorrects]));
+    
+    savedData[levelKey] = updatedLevelSentences;
+    localStorage.setItem('incorrect_sentences', JSON.stringify(savedData));
+    
+    router.push('/');
   };
 
   const goToNext = () => {
     if (currentIdx < sentences.length - 1) {
       setCurrentIdx(currentIdx + 1);
-      setIsChecking(false);
     } else {
-      // 마지막 문제에서 학습 마치기 클릭 시 저장
-      saveIncorrectSentences();
-      router.push('/');
+      setViewMode('review');
     }
   };
 
   const goToPrev = () => {
     if (currentIdx > 0) {
       setCurrentIdx(currentIdx - 1);
-      setIsChecking(false);
     }
   };
+
+  if (viewMode === 'review') {
+    return (
+      <main className={styles.container}>
+        <header className={styles.header}>
+          <div className={styles.headerInfo}>
+            <span className={styles.stepTitle}>{currentSet.title} - 채점하기 ✨</span>
+            <p className={styles.instruction}>아빠가 틀린 글자를 톡톡 눌러주세요.</p>
+          </div>
+        </header>
+
+        <div className={styles.reviewList}>
+          {sentences.map((sentence, idx) => (
+            <div key={idx} className={styles.reviewItem}>
+              <div className={styles.reviewHeader}>
+                <span className={styles.sentenceNum}>{idx + 1}번</span>
+                <button className={styles.smallAudioButton} onClick={() => handleSpeak(sentence)}>🔈</button>
+              </div>
+              <WongojiInput 
+                sentence={sentence}
+                errorIndices={errorsBySentence[idx] || []}
+                onToggleError={(charIdx) => handleToggleError(idx, charIdx)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.footerActions}>
+          <button className={styles.backToPracticeButton} onClick={() => setViewMode('practice')}>
+            다시 써보기
+          </button>
+          <button className={styles.doneButton} onClick={saveAllIncorrectSentences}>
+            채점 완료 및 오답 저장 🎁
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.container}>
@@ -122,32 +157,27 @@ function PracticeContent() {
           <span className={styles.stepTitle}>{currentSet.title}</span>
           <span className={styles.stepCount}>문제 {currentIdx + 1} / {sentences.length}</span>
         </div>
-        <button className={styles.navButton} onClick={goToNext} disabled={currentIdx === sentences.length - 1}>▶</button>
+        <button className={styles.navButton} onClick={goToNext}>▶</button>
       </header>
 
       <div className={styles.mainAction}>
-        <button className={styles.bigAudioButton} onClick={handleSpeak}>
+        <button className={styles.bigAudioButton} onClick={() => handleSpeak(currentSentence)}>
           🔊 크게 듣기
         </button>
-        <p className={styles.instruction}>율이가 공책에 다 쓰면 아래 버튼을 눌러주세요.</p>
+        <p className={styles.instruction}>율이가 공책에 다 쓰면 다음 버튼을 눌러주세요.</p>
       </div>
 
-      {!isChecking ? (
-        <button className={styles.checkStartButton} onClick={() => setIsChecking(true)}>
-          채점 시작하기 ✨
-        </button>
-      ) : (
-        <div className={styles.checkerArea}>
-          <WongojiInput 
-            sentence={currentSentence}
-            errorIndices={currentErrors}
-            onToggleError={handleToggleError}
-          />
-          <button className={styles.doneButton} onClick={goToNext}>
-             {currentIdx === sentences.length - 1 ? "학습 마치기 🎁" : "다음 문제로 ▶"}
+      <div className={styles.practiceFooter}>
+        {currentIdx === sentences.length - 1 ? (
+          <button className={styles.checkStartButton} onClick={() => setViewMode('review')}>
+            채점 시작하기 ✍️
           </button>
-        </div>
-      )}
+        ) : (
+          <button className={styles.nextButton} onClick={goToNext}>
+            다 쓰면 다음 문제로! ⮕
+          </button>
+        )}
+      </div>
     </main>
   );
 }

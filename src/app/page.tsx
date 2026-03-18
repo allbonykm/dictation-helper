@@ -11,8 +11,20 @@ export default function Home() {
   const [incorrectCount, setIncorrectCount] = useState(0);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('incorrect_sentences') || '[]');
-    setIncorrectCount(saved.length);
+    const rawSaved = localStorage.getItem('incorrect_sentences');
+    try {
+      const parsed = JSON.parse(rawSaved || '{}');
+      if (Array.isArray(parsed)) {
+        setIncorrectCount(parsed.length);
+      } else {
+        // 객체인 경우 모든 벨류(배열)의 길이를 합산
+        const total = Object.values(parsed as Record<string, string[]>)
+          .reduce((acc, curr) => acc + curr.length, 0);
+        setIncorrectCount(total);
+      }
+    } catch {
+      setIncorrectCount(0);
+    }
   }, []);
 
   return (

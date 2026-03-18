@@ -7,21 +7,33 @@ import styles from '../practice/practice.module.css';
 
 export default function IncorrectNotePage() {
   const router = useRouter();
-  const [sentences, setSentences] = useState<string[]>([]);
+  const [groupedSentences, setGroupedSentences] = useState<Record<string, string[]>>({});
+  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isChecking, setIsChecking] = useState(false);
   const [errorIndices, setErrorIndices] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('incorrect_sentences') || '[]');
-    setSentences(saved);
+    const rawSaved = localStorage.getItem('incorrect_sentences');
+    try {
+      const parsed = JSON.parse(rawSaved || '{}');
+      if (Array.isArray(parsed)) {
+        setGroupedSentences({ "미분류": parsed });
+      } else {
+        setGroupedSentences(parsed);
+      }
+    } catch {
+      setGroupedSentences({});
+    }
     setIsLoading(false);
   }, []);
 
+  const totalCount = Object.values(groupedSentences).flat().length;
+
   if (isLoading) return <div className={styles.container}>불러오는 중...</div>;
 
-  if (sentences.length === 0) {
+  if (totalCount === 0) {
     return (
       <div className={styles.container}>
         <h2 style={{fontSize: '2rem', marginBottom: '2rem'}}>🎉 율이야, 대단해!</h2>
@@ -33,14 +45,48 @@ export default function IncorrectNotePage() {
     );
   }
 
+  // 급수 선택 화면
+  if (!selectedLevel) {
+    return (
+      <main className={styles.container}>
+        <header className={styles.header}>
+            <span className={styles.stepTitle}>📖 오답 노트 보관함</span>
+        </header>
+        <p className={styles.instruction}>다시 공부할 급수를 골라주세요.</p>
+        
+        <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '400px', marginTop: '2rem'}}>
+          {Object.entries(groupedSentences).map(([level, items]) => (
+            items.length > 0 && (
+              <button 
+                key={level} 
+                className={styles.nextButton} 
+                onClick={() => {
+                  setSelectedLevel(level);
+                  setCurrentIdx(0);
+                }}
+                style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}
+              >
+                <span>{level} 오답</span>
+                <span style={{fontSize: '0.9rem', opacity: 0.7}}>{items.length}개 남음</span>
+              </button>
+            )
+          ))}
+        </div>
+
+        <button onClick={() => router.push('/')} style={{marginTop: '3rem', color: '#888', background: 'none', border: 'none', textDecoration: 'underline'}}>
+          홈으로 돌아가기
+        </button>
+      </main>
+    );
+  }
+
+  const sentences = groupedSentences[selectedLevel] || [];
   const currentSentence = sentences[currentIdx];
 
   const handleSpeak = () => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
     window.speechSynthesis.cancel();
     window.speechSynthesis.resume();
-
     if (!currentSentence) return;
 
     setTimeout(() => {
@@ -49,10 +95,6 @@ export default function IncorrectNotePage() {
       utterance.lang = 'ko-KR';
       utterance.rate = 0.8;
       utterance.pitch = 1.0;
-
-      utterance.onstart = () => console.log("🔊 오답 음성 시작: ", currentSentence);
-      utterance.onerror = (e) => console.error("❌ 오답 음성 에러:", (e as any).error);
-
       (window as any)._lastUtterance = utterance;
       window.speechSynthesis.speak(utterance);
     }, 250);
@@ -65,19 +107,29 @@ export default function IncorrectNotePage() {
   };
 
   const handleNextProblem = () => {
-    // 채점 결과 오답이 없으면(문제를 맞혔으면) 목록에서 삭제
-    let newSentences = [...sentences];
+    const newGrouped = { ...groupedSentences };
+    const levelSentences = [...newGrouped[selectedLevel]];
+    
     if (errorIndices.length === 0) {
-      newSentences.splice(currentIdx, 1);
-      localStorage.setItem('incorrect_sentences', JSON.stringify(newSentences));
-      setSentences(newSentences);
-      // 인덱스 조정: 마지막 문제를 삭제한 경우 하나 앞으로
-      if (currentIdx >= newSentences.length && currentIdx > 0) {
+      // 해결됨: 삭제
+      levelSentences.splice(currentIdx, 1);
+      newGrouped[selectedLevel] = levelSentences;
+      
+      // 만약 해당 급수의 오답이 다 없어졌다면 키 삭제
+      if (levelSentences.length === 0) {
+        delete newGrouped[selectedLevel];
+        setSelectedLevel(null);
+      }
+      
+      localStorage.setItem('incorrect_sentences', JSON.stringify(newGrouped));
+      setGroupedSentences(newGrouped);
+
+      if (currentIdx >= levelSentences.length && currentIdx > 0) {
         setCurrentIdx(currentIdx - 1);
       }
     } else {
-      // 여전히 오답이 있으면 그대로 두고 다음 오답으로
-      setCurrentIdx((currentIdx + 1) % sentences.length);
+      // 미해결: 다음 문제로
+      setCurrentIdx((currentIdx + 1) % levelSentences.length);
     }
     
     setIsChecking(false);
@@ -87,8 +139,10 @@ export default function IncorrectNotePage() {
   return (
     <main className={styles.container}>
       <header className={styles.header}>
-        <span className={styles.stepTitle}>📝 오답 노트</span>
-        <span className={styles.stepCount}>{currentIdx + 1} / {sentences.length}</span>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <span className={styles.stepTitle}>{selectedLevel} 오답 연습</span>
+          <span className={styles.stepCount}>{currentIdx + 1} / {sentences.length}</span>
+        </div>
       </header>
 
       <div className={styles.mainAction}>
@@ -115,8 +169,8 @@ export default function IncorrectNotePage() {
         </div>
       )}
 
-      <button onClick={() => router.push('/')} style={{marginTop: '2rem', color: '#888', background: 'none', border: 'none', textDecoration: 'underline'}}>
-        학습 중단하고 나가기
+      <button onClick={() => setSelectedLevel(null)} style={{marginTop: '2rem', color: '#888', background: 'none', border: 'none', textDecoration: 'underline'}}>
+        다른 급수 선택하러 가기
       </button>
     </main>
   );
