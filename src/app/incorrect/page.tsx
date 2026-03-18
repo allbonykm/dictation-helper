@@ -44,6 +44,9 @@ export default function IncorrectNotePage() {
       utterance.lang = 'ko-KR';
       utterance.rate = 0.8;
       utterance.pitch = 1.0;
+
+      // 가비지 컬렉션 방지
+      (window as any)._utterance = utterance;
       
       window.speechSynthesis.speak(utterance);
     }

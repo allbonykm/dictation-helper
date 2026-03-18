@@ -46,8 +46,11 @@ function PracticeContent() {
       utterance.lang = 'ko-KR';
       utterance.rate = 0.8;
       utterance.pitch = 1.0;
+
+      // 3. 가비지 컬렉션 방지: 전역 객체에 참조 유지
+      (window as any)._utterance = utterance;
       
-      // 3. 브라우저가 음성을 끝까지 내보내도록 보장
+      // 4. 브라우저가 음성을 끝까지 내보내도록 보장
       window.speechSynthesis.speak(utterance);
     }
   };
