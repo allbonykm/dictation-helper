@@ -39,21 +39,23 @@ export default function IncorrectNotePage() {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
 
     if (!currentSentence) return;
 
     setTimeout(() => {
+      window.speechSynthesis.resume();
       const utterance = new SpeechSynthesisUtterance(currentSentence);
       utterance.lang = 'ko-KR';
       utterance.rate = 0.8;
       utterance.pitch = 1.0;
 
       utterance.onstart = () => console.log("🔊 오답 음성 시작: ", currentSentence);
-      utterance.onerror = (e) => console.error("❌ 오답 음성 에러:", (e as any).error, e);
+      utterance.onerror = (e) => console.error("❌ 오답 음성 에러:", (e as any).error);
 
-      (window as any)._utterance = utterance;
+      (window as any)._lastUtterance = utterance;
       window.speechSynthesis.speak(utterance);
-    }, 50);
+    }, 250);
   };
 
   const handleToggleError = (index: number) => {

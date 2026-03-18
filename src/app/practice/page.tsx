@@ -38,33 +38,36 @@ function PracticeContent() {
   const handleSpeak = () => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
-    // 진행 중인 모든 음성을 중단하여 명령 큐를 정리합니다.
+    // 1. 기존 재생 중단 및 엔진 깨우기
     window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
 
-    if (!currentSentence) {
-      console.warn("🔊 재생할 문장이 없습니다.");
-      return;
-    }
+    if (!currentSentence) return;
 
-    // 약간의 지연 시간을 두어 cancel()이 확실히 처리되게 합니다.
+    // 2. 브라우저가 이전 명령을 완전히 정리할 수 있도록 넉넉한 시간을 줍니다.
     setTimeout(() => {
+      // 간혹 엔진이 일시정지 상태로 고착되는 경우가 있어 한 번 더 resume()
+      window.speechSynthesis.resume();
+
       const utterance = new SpeechSynthesisUtterance(currentSentence);
       utterance.lang = 'ko-KR';
       utterance.rate = 0.8;
       utterance.pitch = 1.0;
 
       utterance.onstart = () => console.log("🔊 음성 재생 시작: ", currentSentence);
-      utterance.onend = () => console.log("✅ 음성 재생 완료");
       utterance.onerror = (e) => {
-        console.error("❌ 음성 재생 에러 발생:", (e as any).error, e);
-        // 'interrupted' 에러 시 재시도 로직이나 추가 안내가 필요할 수 있음
+        console.error("❌ 음성 재생 에러:", (e as any).error);
+        // 만약 또 중단되면 엔진을 완전히 초기화하고 다시 한 번 resume 시도
+        if ((e as any).error === 'interrupted') {
+          window.speechSynthesis.resume();
+        }
       };
 
-      // 가비지 컬렉션 방지를 위해 전역 객체에 참조를 보관합니다.
-      (window as any)._utterance = utterance;
+      // 가비지 컬렉션 방지를 위한 전역 참조
+      (window as any)._lastUtterance = utterance;
       
       window.speechSynthesis.speak(utterance);
-    }, 50);
+    }, 250);
   };
 
   const handleToggleError = (charIndex: number) => {
