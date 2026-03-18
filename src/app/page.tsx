@@ -36,7 +36,7 @@ export default function Home() {
         
         <p className={styles.description}>
           세상에서 제일 소중한 우리 율이,<br />
-          오늘은 아빠랑 어떤 공부를 해볼까? ✨
+          율이를 위한 받아쓰기 도우미
         </p>
 
         <div className={styles.buttonGroup}>
