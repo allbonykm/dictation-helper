@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { DICTATION_DATA } from '../../data/sentences';
 import WongojiInput from '../../components/WongojiInput';
 import styles from './practice.module.css';
@@ -114,6 +115,7 @@ function PracticeContent() {
   if (viewMode === 'review') {
     return (
       <main className={styles.container}>
+        <Link href="/" className="homeLink" title="홈으로">🏠</Link>
         <header className={styles.header}>
           <div className={styles.headerInfo}>
             <span className={styles.stepTitle}>{currentSet.title} - 채점하기 ✨</span>
@@ -151,6 +153,7 @@ function PracticeContent() {
 
   return (
     <main className={styles.container}>
+      <Link href="/" className="homeLink" title="홈으로">🏠</Link>
       <header className={styles.header}>
         <button className={styles.navButton} onClick={goToPrev} disabled={currentIdx === 0}>◀</button>
         <div className={styles.headerInfo}>

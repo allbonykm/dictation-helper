@@ -66,6 +66,35 @@ button:active {
   transform: scale(0.95);
 }
 
+.homeLink {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  text-decoration: none;
+  background: white;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  font-size: 1.1rem;
+  border: 2px solid var(--primary);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.homeLink:hover {
+  transform: scale(1.15) rotate(-10deg);
+  background-color: #fff8f8;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Common Components */
 .card {
   background: white;

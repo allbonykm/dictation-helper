@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import WongojiInput from '../../components/WongojiInput';
 import styles from '../practice/practice.module.css';
 
@@ -49,6 +50,7 @@ export default function IncorrectNotePage() {
   if (!selectedLevel) {
     return (
       <main className={styles.container}>
+        <Link href="/" className="homeLink" title="홈으로">🏠</Link>
         <header className={styles.header}>
             <span className={styles.stepTitle}>📖 오답 노트 보관함</span>
         </header>
@@ -138,6 +140,7 @@ export default function IncorrectNotePage() {
 
   return (
     <main className={styles.container}>
+      <Link href="/" className="homeLink" title="홈으로">🏠</Link>
       <header className={styles.header}>
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <span className={styles.stepTitle}>{selectedLevel} 오답 연습</span>
