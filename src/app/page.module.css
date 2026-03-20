@@ -72,6 +72,7 @@
 }
 
 .stepButton {
+  position: relative;
   background-color: var(--primary);
   color: white;
   font-weight: 700;
@@ -90,6 +91,61 @@
   transform: translateY(-2px);
 }
 
+.scoreBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #4A4A4A;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 800;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.scoreBadge100 {
+  background-color: #FFD700; /* Gold */
+  color: #4A4A4A;
+  border: 2px solid #FFF;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.scoreBadge100::after {
+  content: '⭐';
+  position: absolute;
+  top: -10px;
+  font-size: 0.8rem;
+}
+
+.editScoreButton {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  padding: 0;
+}
+
+.editScoreButton:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.5);
+}
+
 .subButton {
   font-weight: 700;
   font-size: 1rem;
@@ -101,6 +157,57 @@
 .subButton:hover {
   filter: brightness(0.95);
   transform: translateY(-2px);
+}
+
+.celebrationOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 252, 248, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.5s ease-out;
+  backdrop-filter: blur(5px);
+}
+
+.geckoContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: geckoJump 1s ease-in-out infinite;
+}
+
+.geckoBubble {
+  background: white;
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  border: 4px solid var(--primary);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 5.5rem;
+  box-shadow: 0 10px 20px rgba(255, 183, 178, 0.2);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.geckoImage {
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+}
+
+@keyframes geckoJump {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-30px) scale(1.05); }
+}
+
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 

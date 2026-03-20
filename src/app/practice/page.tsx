@@ -21,12 +21,25 @@ function PracticeContent() {
   const [viewMode, setViewMode] = useState<'practice' | 'review'>('practice');
   const [errorsBySentence, setErrorsBySentence] = useState<Record<number, number[]>>({});
   const [speakSpeed, setSpeakSpeed] = useState<number>(0.8); // 기본 속도 0.8
+  const [shuffledSentences, setShuffledSentences] = useState<string[]>([]);
 
-  // 해당 급의 정보가 존재하지 않을 경우 처리
-  if (!currentSet) {
+  // 문제 랜덤하게 섞기 (Fisher-Yates Shuffle)
+  useEffect(() => {
+    if (currentSet && currentSet.sentences) {
+      const original = [...currentSet.sentences];
+      for (let i = original.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [original[i], original[j]] = [original[j], original[i]];
+      }
+      setShuffledSentences(original);
+    }
+  }, [currentSet]);
+
+  // 해당 급의 정보가 존재하지 않거나 로딩 중일 때 처리
+  if (!currentSet || shuffledSentences.length === 0) {
     return (
       <div className={styles.container}>
-        <h2>앗! {stepId}급 정보를 찾을 수 없어요.</h2>
+        <h2>{currentSet ? "준비 중..." : `앗! ${stepId}급 정보를 찾을 수 없어요.`}</h2>
         <button className={styles.checkStartButton} onClick={() => router.push('/')}>
           처음으로 돌아가기
         </button>
@@ -34,7 +47,7 @@ function PracticeContent() {
     );
   }
 
-  const sentences = currentSet.sentences;
+  const sentences = shuffledSentences; // 이제 원본 대신 섞인 리스트를 사용합니다.
   const currentSentence = sentences[currentIdx];
 
   const handleSpeak = (text: string) => {
