@@ -14,6 +14,7 @@ function PracticeContent() {
   
   // URL에서 몇 급인지 가져옴 (기본값 1급)
   const stepParam = searchParams.get('step');
+  const modeParam = searchParams.get('mode') || 'sequential';
   const stepId = stepParam ? parseInt(stepParam) : 1;
   const currentSet = DICTATION_DATA[stepId];
 
@@ -23,17 +24,20 @@ function PracticeContent() {
   const [speakSpeed, setSpeakSpeed] = useState<number>(0.8); // 기본 속도 0.8
   const [shuffledSentences, setShuffledSentences] = useState<string[]>([]);
 
-  // 문제 랜덤하게 섞기 (Fisher-Yates Shuffle)
+  // 문제 섞기 또는 순서 유지
   useEffect(() => {
     if (currentSet && currentSet.sentences) {
-      const original = [...currentSet.sentences];
-      for (let i = original.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [original[i], original[j]] = [original[j], original[i]];
+      const sentences = [...currentSet.sentences];
+      if (modeParam === 'random') {
+        for (let i = sentences.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [sentences[i], sentences[j]] = [sentences[j], sentences[i]];
+        }
       }
-      setShuffledSentences(original);
+      setShuffledSentences(sentences);
     }
-  }, [currentSet]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSet, modeParam]);
 
   // 해당 급의 정보가 존재하지 않거나 로딩 중일 때 처리
   if (!currentSet || shuffledSentences.length === 0) {
@@ -62,7 +66,7 @@ function PracticeContent() {
       utterance.lang = 'ko-KR';
       utterance.rate = speakSpeed; // 선택된 속도 적용
       utterance.pitch = 1.0;
-      (window as any)._lastUtterance = utterance;
+      (window as unknown as { _lastUtterance: SpeechSynthesisUtterance })._lastUtterance = utterance;
       window.speechSynthesis.speak(utterance);
     }, 100);
   };
@@ -82,8 +86,8 @@ function PracticeContent() {
   const saveAllIncorrectSentences = () => {
     // 에러가 1개라도 체크된 문장들만 추출
     const incorrects = Object.entries(errorsBySentence)
-      .filter(([_, indices]) => indices.length > 0)
-      .map(([idx, _]) => sentences[parseInt(idx)]);
+      .filter(([, indices]) => indices.length > 0)
+      .map(([idx]) => sentences[parseInt(idx)]);
 
     // 기존 저장 데이터 가져오기 (객체 형태: { "1급": [...], "2급": [...] })
     const rawSaved = localStorage.getItem('incorrect_sentences');
@@ -210,7 +214,12 @@ function PracticeContent() {
       <header className={styles.header}>
         <button className={styles.navButton} onClick={goToPrev} disabled={currentIdx === 0}>◀</button>
         <div className={styles.headerInfo}>
-          <span className={styles.stepTitle}>{currentSet.title}</span>
+          <span className={styles.stepTitle}>
+            {currentSet.title}
+            <span className={styles.modeBadge}>
+              {modeParam === 'random' ? '🎲 무작위' : '📖 순서대로'}
+            </span>
+          </span>
           <span className={styles.stepCount}>문제 {currentIdx + 1} / {sentences.length}</span>
         </div>
         <button className={styles.navButton} onClick={goToNext}>▶</button>

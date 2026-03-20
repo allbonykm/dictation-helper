@@ -12,16 +12,19 @@ export const metadata: Metadata = {
   title: "청곡초 2학년 받아쓰기 도우미",
   description: "아빠가 사랑을 담아 만든 율이의 받아쓰기 연습 앱",
   manifest: "/manifest.json",
-  themeColor: "#FFB7B2",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "율이 받아쓰기",
   },
   icons: {
-    icon: "/icon.png?v=2",
-    apple: "/apple-icon.png?v=2",
+    icon: "/icon.png?v=8",
+    apple: "/apple-icon.png?v=8",
   },
+};
+
+export const viewport = {
+  themeColor: "#FFB7B2",
 };
 
 export default function RootLayout({

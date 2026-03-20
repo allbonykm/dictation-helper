@@ -25,6 +25,20 @@
   font-size: 1.1rem;
   font-weight: 800;
   color: var(--primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.modeBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ff8fab;
+  background-color: #fff0f3;
+  padding: 0.1rem 0.6rem;
+  border-radius: 20px;
+  border: 1px solid #ffdeeb;
 }
 
 .stepCount {

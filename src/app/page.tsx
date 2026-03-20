@@ -13,6 +13,7 @@ export default function Home() {
   const [incorrectCount, setIncorrectCount] = useState(0);
   const [levelScores, setLevelScores] = useState<Record<string, number>>({});
   const [showCelebration, setShowCelebration] = useState(false);
+  const [practiceMode, setPracticeMode] = useState<'sequential' | 'random'>('sequential');
 
   useEffect(() => {
     // 오답 개수 로드
@@ -100,12 +101,13 @@ export default function Home() {
       <div className={styles.welcomeCard}>
         <div className={styles.iconWrapper}>
           <Image
-            src="/heart.png"
-            alt="행복한 하트"
-            width={180}
-            height={180}
+            src="/gecko_pencil_v10.png"
+            alt="연필 든 게코"
+            width={200}
+            height={200}
             className={styles.heartIcon}
             priority
+            unoptimized
           />
         </div>
 
@@ -121,12 +123,28 @@ export default function Home() {
 
         <div className={styles.buttonGroup}>
           <p className={styles.selectLabel}>받아쓰기 급수를 골라주세요!</p>
+          
+          <div className={styles.modeToggleContainer}>
+            <button 
+              className={`${styles.modeToggleButton} ${practiceMode === 'sequential' ? styles.activeMode : ''}`}
+              onClick={() => setPracticeMode('sequential')}
+            >
+              📖 순서대로 연습
+            </button>
+            <button 
+              className={`${styles.modeToggleButton} ${practiceMode === 'random' ? styles.activeMode : ''}`}
+              onClick={() => setPracticeMode('random')}
+            >
+              🎲 무작위 시험
+            </button>
+          </div>
+
           <div className={styles.stepGrid}>
             {steps.map((step) => {
               const score = levelScores[step.id];
               return (
                 <div key={step.id} style={{ position: 'relative' }}>
-                  <Link href={`/practice?step=${step.id}`} style={{ textDecoration: 'none' }}>
+                  <Link href={`/practice?step=${step.id}&mode=${practiceMode}`} style={{ textDecoration: 'none' }}>
                     <button className={styles.stepButton}>
                       {step.id}급
                       {score !== undefined && (
