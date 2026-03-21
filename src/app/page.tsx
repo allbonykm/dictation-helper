@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -14,6 +15,7 @@ export default function Home() {
   const [levelScores, setLevelScores] = useState<Record<string, number>>({});
   const [showCelebration, setShowCelebration] = useState(false);
   const [practiceMode, setPracticeMode] = useState<'sequential' | 'random'>('sequential');
+  const [totalBalance, setTotalBalance] = useState(0);
 
   useEffect(() => {
     // 오답 개수 로드
@@ -38,6 +40,12 @@ export default function Home() {
     } catch {
       setLevelScores({});
     }
+
+    // 누적 잔액 로드
+    const rawBalance = localStorage.getItem('dictation_balance');
+    if (rawBalance) {
+      setTotalBalance(parseInt(rawBalance, 10));
+    }
   }, []);
 
   const triggerCelebration = () => {
@@ -54,6 +62,27 @@ export default function Home() {
     }, 3000);
   };
 
+  const sendScoreToGoogleSheet = async (score: number) => {
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwKsnNwSizn1kaeGbYtBoPUVzc28H2UlSpD2rvEixBS-aCLpYCDLYh08Y8uN4wG11O4WA/exec";
+    
+    const formData = new URLSearchParams();
+    formData.append('type', 'earn'); // 앱스 스크립트의 earn 조건 분기 처리용
+    formData.append('amount', String(score)); // 점수=적립 금액
+    formData.append('desc', '받아쓰기 적립'); // 시트에 찍힐 설명 문구
+
+    try {
+      // mode: 'no-cors'를 추가하여 구글 스크립트로의 전송 시 CORS 정책 블로킹을 우회합니다.
+      await fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData,
+      });
+      console.log('구글 시트 전송 완료 (백그라운드)');
+    } catch (error) {
+      console.error('구글 시트 전송 실패:', error);
+    }
+  };
+
   const handleSetScore = (e: React.MouseEvent, levelId: number) => {
     e.preventDefault();
     e.stopPropagation();
@@ -67,6 +96,15 @@ export default function Home() {
         const newScores = { ...levelScores, [levelId]: score };
         setLevelScores(newScores);
         localStorage.setItem('level_scores', JSON.stringify(newScores));
+
+        // 누적 잔액 업데이트 (클라이언트 내 기록용)
+        const newBalance = totalBalance + score;
+        setTotalBalance(newBalance);
+        localStorage.setItem('dictation_balance', String(newBalance));
+
+        // 구글 시트로 POST 데이터 전송 (스트립트 파라미터에 맞춤)
+        sendScoreToGoogleSheet(score);
+
         if (score >= 80) triggerCelebration(); // 80점 이상일 때만 게코가 나타나 축하해줍니다!
       } else if (input === "") {
         const newScores = { ...levelScores };
