@@ -147,21 +147,24 @@ export default function IncorrectNotePage() {
   const sentences = groupedSentences[selectedLevel] || [];
   const currentSentence = sentences[currentIdx];
 
-  const handleSpeak = () => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
+  const handleSpeak = async () => {
     if (!currentSentence) return;
-
-    setTimeout(() => {
-      window.speechSynthesis.resume();
-      const utterance = new SpeechSynthesisUtterance(currentSentence);
-      utterance.lang = 'ko-KR';
-      utterance.rate = speakSpeed;
-      utterance.pitch = 1.0;
-      (window as any)._lastUtterance = utterance;
-      window.speechSynthesis.speak(utterance);
-    }, 250);
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: currentSentence, rate: speakSpeed }),
+      });
+      const data = await res.json();
+      if (data.audioContent) {
+        const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+        audio.play();
+      } else if (data.error) {
+        console.error('TTS 에러:', data.error);
+      }
+    } catch (error) {
+      console.error('TTS 요청 실패:', error);
+    }
   };
 
   const handleToggleError = (index: number) => {
