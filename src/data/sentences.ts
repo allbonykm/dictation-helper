@@ -9,7 +9,7 @@ export const DICTATION_DATA: Record<number, DictationSet> = {
     id: 1,
     title: "1급",
     sentences: [
-      "콧등에 땀이 송골송골",
+      "콧잔등에 땀이 송골송골",
       "오늘 급식은 짜장면이다!",
       "침대 밑 나라에서",
       "몽당연필이 되려면",
@@ -90,7 +90,7 @@ export const DICTATION_DATA: Record<number, DictationSet> = {
     title: "6급",
     sentences: [
       "옷의 색이나 무늬",
-      "수박도 둥둥 띄울래요.",
+      "수박도 동동 띄울래요.",
       "내 볼을 핥아서",
       "앞치마를 두릅니다.",
       "두께가 얇고 소매가 짧은",
