@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { DICTATION_DATA } from '../../data/sentences';
@@ -22,6 +22,9 @@ function PracticeContent() {
   const [viewMode, setViewMode] = useState<'practice' | 'review'>('practice');
   const [errorsBySentence, setErrorsBySentence] = useState<Record<number, number[]>>({});
   const [speakSpeed, setSpeakSpeed] = useState<number>(0.8); // 기본 속도 0.8
+  const [isSpeaking, setIsSpeaking] = useState(false); // TTS 재생 중 여부
+  // 동일 문장 반복 API 요청 방지를 위한 클라이언트 캐시 (text+speed → base64 audio)
+  const audioCacheRef = useRef<Map<string, string>>(new Map());
   const [shuffledSentences, setShuffledSentences] = useState<string[]>([]);
 
   // 문제 섞기 또는 순서 유지
@@ -54,21 +57,53 @@ function PracticeContent() {
   const sentences = shuffledSentences; // 이제 원본 대신 섞인 리스트를 사용합니다.
   const currentSentence = sentences[currentIdx];
 
-  const handleSpeak = (text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
-    if (!text) return;
+  const handleSpeak = async (text: string) => {
+    if (!text || isSpeaking) return;
 
-    setTimeout(() => {
-      window.speechSynthesis.resume();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ko-KR';
-      utterance.rate = speakSpeed; // 선택된 속도 적용
-      utterance.pitch = 1.0;
-      (window as unknown as { _lastUtterance: SpeechSynthesisUtterance })._lastUtterance = utterance;
-      window.speechSynthesis.speak(utterance);
-    }, 100);
+    // 캐시 키: 텍스트 + 속도 조합
+    const cacheKey = `${text}__${speakSpeed}`;
+    const cached = audioCacheRef.current.get(cacheKey);
+
+    if (cached) {
+      // 캐시에 있으면 바로 재생
+      playAudio(cached);
+      return;
+    }
+
+    setIsSpeaking(true);
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, rate: speakSpeed }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error('TTS 오류:', err.error);
+        alert(`TTS 오류: ${err.error}`);
+        return;
+      }
+
+      const data = await res.json();
+      const audioContent: string = data.audioContent;
+
+      // 캐시에 저장
+      audioCacheRef.current.set(cacheKey, audioContent);
+      playAudio(audioContent);
+    } catch (error) {
+      console.error('TTS 요청 실패:', error);
+    } finally {
+      setIsSpeaking(false);
+    }
+  };
+
+  const playAudio = (base64Audio: string) => {
+    const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
+    setIsSpeaking(true);
+    audio.onended = () => setIsSpeaking(false);
+    audio.onerror = () => setIsSpeaking(false);
+    audio.play();
   };
 
   const handleToggleError = (sentenceIdx: number, charIndex: number) => {
@@ -226,18 +261,22 @@ function PracticeContent() {
       </header>
 
       <div className={styles.mainAction}>
-        <button className={styles.bigAudioButton} onClick={() => handleSpeak(currentSentence)}>
-          🔊 크게 듣기
+        <button
+          className={`${styles.bigAudioButton} ${isSpeaking ? styles.speakingButton : ''}`}
+          onClick={() => handleSpeak(currentSentence)}
+          disabled={isSpeaking}
+        >
+          {isSpeaking ? '🎵 재생 중...' : '🔊 크게 듣기'}
         </button>
         
         <div className={styles.speedControls}>
           <button 
             className={`${styles.speedButton} ${speakSpeed === 1.0 ? styles.activeSpeed : ''}`}
-            onClick={() => setSpeakSpeed(1.0)}
+            onClick={() => { setSpeakSpeed(1.0); audioCacheRef.current.clear(); }}
           >보통</button>
           <button 
             className={`${styles.speedButton} ${speakSpeed === 0.6 ? styles.activeSpeed : ''}`}
-            onClick={() => setSpeakSpeed(0.6)}
+            onClick={() => { setSpeakSpeed(0.6); audioCacheRef.current.clear(); }}
           >🐢 느리게</button>
         </div>
 

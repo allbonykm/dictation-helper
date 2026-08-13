@@ -78,6 +78,21 @@
   font-size: 1.5rem;
   padding: 1.5rem 3rem;
   box-shadow: 0 6px 20px rgba(178, 226, 242, 0.4);
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+/* TTS 재생 중 버튼 상태 */
+.speakingButton {
+  background-color: #d4edda;
+  color: #1a6630;
+  opacity: 0.85;
+  cursor: not-allowed;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 6px 20px rgba(100, 200, 130, 0.3); }
+  50% { box-shadow: 0 6px 28px rgba(100, 200, 130, 0.7); }
 }
 
 .checkStartButton {
