@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     input: { text },
     voice: {
       languageCode: 'ko-KR',
-      name: 'ko-KR-Wavenet-A', // 가장 자연스러운 한국어 여성 WaveNet 음성
+      name: 'ko-KR-Neural2-A', // 최신 Neural2 인공지능 고품질 여성 음성
     },
     audioConfig: {
       audioEncoding: 'MP3',
