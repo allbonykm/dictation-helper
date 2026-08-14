@@ -21,7 +21,7 @@ function PracticeContent() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [viewMode, setViewMode] = useState<'practice' | 'review'>('practice');
   const [errorsBySentence, setErrorsBySentence] = useState<Record<number, number[]>>({});
-  const [speakSpeed, setSpeakSpeed] = useState<number>(0.8); // 기본 속도 0.8
+  const [speakSpeed, setSpeakSpeed] = useState<number>(1.0); // 기본 속도 1.0
   const [isSpeaking, setIsSpeaking] = useState(false); // TTS 재생 중 여부
   // 동일 문장 반복 API 요청 방지를 위한 클라이언트 캐시 (text+speed → base64 audio)
   const audioCacheRef = useRef<Map<string, string>>(new Map());

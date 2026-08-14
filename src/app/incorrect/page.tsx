@@ -18,7 +18,7 @@ export default function IncorrectNotePage() {
   const [isChecking, setIsChecking] = useState(false);
   const [errorIndices, setErrorIndices] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [speakSpeed, setSpeakSpeed] = useState<number>(0.8);
+  const [speakSpeed, setSpeakSpeed] = useState<number>(1.0);
 
   useEffect(() => {
     const rawSaved = localStorage.getItem('incorrect_sentences');
